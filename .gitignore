@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+node_modules/
+artifacts/
+tmp/
+dist/
+coverage/
+.cache/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.log
+.env
+.env.*
+!.env.example

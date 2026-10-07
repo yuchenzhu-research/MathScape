@@ -1,0 +1,134 @@
+{
+  "phase": "passed",
+  "cores": 18,
+  "gpuExposed": true,
+  "checks": [
+    "CPU 1/4/8 workers: bit-exact histograms and latest dice",
+    "Real GPU n=1: 12 exact integer fixtures passed",
+    "Real GPU n=10: 12 exact integer fixtures passed",
+    "Real GPU n=100: 12 exact integer fixtures passed",
+    "GPU million-group end-to-end result matches CPU"
+  ],
+  "timings": [
+    {
+      "requested": 1,
+      "actual": 1,
+      "backend": "cpu",
+      "target": 1000000,
+      "wallMs": 808.1000000089407,
+      "preparationMs": 6.899999991059303,
+      "totalMs": 815.2999999970198
+    },
+    {
+      "requested": 4,
+      "actual": 4,
+      "backend": "cpu",
+      "target": 1000000,
+      "wallMs": 216.70000000298023,
+      "preparationMs": 6.0999999940395355,
+      "totalMs": 223
+    },
+    {
+      "requested": 8,
+      "actual": 8,
+      "backend": "cpu",
+      "target": 1000000,
+      "wallMs": 113.70000000298023,
+      "preparationMs": 10.299999997019768,
+      "totalMs": 124
+    },
+    {
+      "requested": "gpu",
+      "actual": 1,
+      "backend": "gpu",
+      "wallMs": 6.200000002980232,
+      "preparationMs": 2.9000000059604645,
+      "totalMs": 9.100000008940697,
+      "fallback": null
+    },
+    {
+      "requested": "auto",
+      "backend": "gpu",
+      "actual": 1,
+      "wallMs": 9.400000005960464,
+      "preparationMs": 454.5,
+      "totalMs": 464
+    }
+  ],
+  "gpuName": "apple metal-3",
+  "auto": {
+    "logicalCores": 18,
+    "browserMemoryGB": 32,
+    "memoryIsApproximate": true,
+    "workers": 1,
+    "backend": "gpu",
+    "gpuSupported": true,
+    "gpuName": "apple metal-3",
+    "profile": [
+      {
+        "backend": "cpu",
+        "workers": 1,
+        "groups": 131072,
+        "elapsedMs": 95.39999999850988,
+        "groupsPerSecond": 1373920.3354512295
+      },
+      {
+        "backend": "cpu",
+        "workers": 2,
+        "groups": 131072,
+        "elapsedMs": 50.5,
+        "groupsPerSecond": 2595485.1485148515
+      },
+      {
+        "backend": "cpu",
+        "workers": 4,
+        "groups": 131072,
+        "elapsedMs": 26.299999997019768,
+        "groupsPerSecond": 4983726.236306185
+      },
+      {
+        "backend": "cpu",
+        "workers": 8,
+        "groups": 131072,
+        "elapsedMs": 15.399999998509884,
+        "groupsPerSecond": 8511168.831992378
+      },
+      {
+        "backend": "cpu",
+        "workers": 12,
+        "groups": 131072,
+        "elapsedMs": 10.850000001490116,
+        "groupsPerSecond": 12080368.661935378
+      },
+      {
+        "backend": "gpu",
+        "workers": 1,
+        "groups": 131072,
+        "elapsedMs": 1.5499999970197678,
+        "groupsPerSecond": 84562580.80775234
+      }
+    ],
+    "calibrating": false,
+    "fallbackReason": null,
+    "groupsPerSecond": 84562580.80775234,
+    "preparationMs": 454.5
+  },
+  "stress": {
+    "phase": "passed",
+    "target": 100000000,
+    "n": 10,
+    "backend": "gpu",
+    "workers": 1,
+    "wallMs": 438,
+    "preparationMs": 8.5,
+    "totalMs": 446.6000000089407,
+    "allFiveHistogramTotals": [
+      100000000,
+      100000000,
+      100000000,
+      100000000,
+      100000000
+    ],
+    "mean": 22.74949973
+  }
+}

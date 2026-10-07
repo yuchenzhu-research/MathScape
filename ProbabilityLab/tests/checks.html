@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="en">
+<head><base href="/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ProbabilityLab verification</title>
+<style>body{font:15px/1.6 system-ui;margin:40px;color:#16343e;background:#edf3f1}button{padding:12px 20px;font:inherit;border-radius:12px;border:1px solid #739796;cursor:pointer}pre{padding:20px;background:white;white-space:pre-wrap;border-radius:16px}h1{font-weight:500}</style>
+<script src="engine.js" defer></script><script src="gpu.js" defer></script><script src="compute.js" defer></script><script src="tests/browser-checks.js" defer></script></head>
+<body><h1>ProbabilityLab · browser verification</h1><p>Real browser workers and real GPU dispatch; no synthetic speed estimates.</p><button id="verify">Run correctness and performance checks</button><label>Dice per stress group <input id="stress-size" type="number" min="1" max="100" value="10"></label><button id="stress">Run 100 million groups</button><pre id="report" role="status">Ready</pre></body></html>

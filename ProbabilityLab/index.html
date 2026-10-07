@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1014">
+  <title>ProbabilityLab · Dice &amp; the central limit theorem</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="engine.js" defer></script>
+  <script src="i18n.js" defer></script>
+  <script src="gpu.js" defer></script>
+  <script src="compute.js" defer></script>
+  <script src="appearance.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">⚄</span><span data-i18n="brand">ProbabilityLab</span></div>
+      <span class="topbar-note" data-i18n="topic">PROBABILITY / CENTRAL LIMIT THEOREM</span>
+      <div class="topbar-actions">
+        <label class="header-field"><span data-i18n="language">Language</span><select id="language-select" data-i18n-aria="language"></select></label>
+        <label class="header-field"><span data-i18n="theme">Appearance</span><select id="theme-select" data-i18n-aria="theme"><option value="auto" data-i18n="themeAuto">Follow system</option><option value="light" data-i18n="themeLight">Daylight</option><option value="dark" data-i18n="themeDark">Night glow</option></select></label>
+      </div>
+    </header>
+    <section class="intro">
+      <span class="local-badge"><span></span><span data-i18n="local">Local experiment</span></span>
+      <p class="eyebrow" data-i18n="eyebrow">Explore probability with a loaded die</p>
+      <h1 data-i18n="title">How do dice make a bell curve?</h1>
+      <p data-i18n="intro">Change the face probabilities and repeat groups of rolls. Compare the original distribution with the distributions of sums and averages.</p>
+    </section>
+    <div class="workspace">
+      <aside class="controls panel" data-i18n-aria="settingsAria">
+        <div class="section-heading"><h2>01 <span data-i18n="probabilitySettings">Design your die</span></h2><span id="probability-total"></span></div>
+        <div class="presets" data-i18n-aria="presetsAria">
+          <button type="button" data-preset="fair" data-i18n="presetFair">Fair die</button>
+          <button type="button" data-preset="skew" aria-pressed="true" data-i18n="presetSkew">Low faces</button>
+          <button type="button" data-preset="ends" data-i18n="presetEnds">Both ends</button>
+        </div>
+        <div id="probability-controls"></div>
+        <p class="control-hint" data-i18n="probabilityHint">Editing one face redistributes the remaining probability proportionally. The total stays at 100%; displayed values are rounded.</p>
+        <div class="divider"></div>
+        <h2 class="settings-title">02 <span data-i18n="samplingSettings">Choose your sampling</span></h2>
+        <div class="setting">
+          <label for="group-size"><span data-i18n="groupSize">Rolls per group</span> <span>n</span></label>
+          <output id="group-size-value" for="group-size"></output>
+          <input id="group-size" type="range" min="1" max="100" step="1" value="10">
+          <div class="range-limits"><span data-i18n="minRolls">1 roll</span><span data-i18n="maxRolls">100 rolls</span></div>
+        </div>
+        <div class="setting">
+          <label for="sample-count"><span data-i18n="groups">Number of groups</span> <span>M</span></label>
+          <output id="sample-count-value" for="sample-count"></output>
+          <input id="sample-count" type="range" min="2" max="8" step="0.02" value="5">
+          <div class="range-limits"><span data-i18n="minGroups">100 groups</span><span data-i18n="maxGroups">100 million</span></div>
+          <label class="sr-only" for="sample-count-input" data-i18n="exactCount">Exact number of groups</label>
+          <input id="sample-count-input" class="number-input" type="number" min="1" max="100000000" step="1" value="100000">
+          <div class="count-presets"><button type="button" data-count="1000">1,000</button><button type="button" data-count="100000">100,000</button><button type="button" data-count="1000000">1,000,000</button><button type="button" data-count="10000000">10,000,000</button></div>
+          <p id="count-error" class="input-error" role="alert" hidden></p>
+        </div>
+        <p id="total-rolls" class="total-rolls"></p>
+        <div class="seed-setting"><label class="checkbox"><input id="fixed-seed" type="checkbox"><span data-i18n="fixedSeed">Fixed seed for reproducible results</span></label><label class="sr-only" for="seed" data-i18n="seedLabel">Random seed</label><input id="seed" class="number-input" type="number" min="0" max="4294967295" step="1" value="42" disabled><p id="seed-error" class="input-error" role="alert" hidden></p></div>
+        <label class="checkbox"><input id="slow-mode" type="checkbox"><span data-i18n="slow">Animate one group at a time</span></label>
+        <details class="compute-settings"><summary data-i18n="computeSettings">Performance</summary><div class="compute-fields">
+          <label for="compute-mode" data-i18n="computeMode">Compute engine</label>
+          <select id="compute-mode"><option value="auto" data-i18n="computeAuto">Automatic · measured</option><option value="cpu" data-i18n="computeCpu">CPU · parallel</option><option value="gpu" data-i18n="computeGpu">GPU · if available</option></select>
+          <label for="worker-count" data-i18n="workerCount">CPU workers</label>
+          <input id="worker-count" class="number-input" type="number" min="0" max="18" step="1" value="0" aria-describedby="worker-hint">
+          <p id="worker-hint" class="control-hint"></p><p id="worker-error" class="input-error" role="alert" hidden></p>
+          <button id="calibrate" type="button" data-i18n="calibrate">Measure &amp; restart</button>
+          <p class="control-hint" data-i18n="calibrationHint">Measured performance selects the engine. Browser limits cannot identify the exact CPU or installed memory.</p>
+        </div></details>
+        <p id="hardware-info" class="hardware-info" role="status" aria-live="polite"></p>
+        <div class="action-row"><button id="start" class="primary" type="button" data-i18n="start">Start simulation</button><button id="pause" type="button" data-i18n="pause" disabled>Pause</button></div>
+        <div class="action-row secondary-actions"><button id="step" type="button" data-i18n="step">Roll one group</button><button id="clear" type="button" data-i18n="clear">Clear results</button></div>
+        <p class="control-hint" data-i18n="resetHint">Changing probabilities or sampling settings clears old results so different experiments are not mixed.</p>
+      </aside>
+      <section class="visuals" data-i18n-aria="visualsAria">
+        <div class="upper-panels">
+          <section class="source-panel panel">
+            <div class="section-heading"><h2 data-i18n="sourceTitle">One-roll distribution</h2><span class="small-label" data-i18n="discrete">Discrete probabilities</span></div>
+            <div class="source-chart"><canvas id="source-chart" role="img"></canvas></div>
+            <p id="single-moments" class="chart-caption"></p>
+          </section>
+          <section class="dice-panel panel">
+            <div class="section-heading"><h2 data-i18n="latestTitle">Latest group</h2><span id="latest-index" class="small-label"></span></div>
+            <div id="dice-tray" class="dice-tray"></div>
+            <div class="last-result"><span data-i18n="lastSum">Group sum</span><strong id="last-sum">—</strong><span class="mean-label"><span data-i18n="average">Average</span> <b id="last-mean">—</b></span></div>
+          </section>
+        </div>
+        <section class="distribution-panel panel">
+          <div class="distribution-heading">
+            <div><p class="eyebrow" data-i18n="samplingEyebrow">SAMPLING DISTRIBUTION</p><h2 id="distribution-title"></h2></div>
+            <div class="mode-switch" role="group" data-i18n-aria="modeAria"><button data-mode="sum" type="button" aria-pressed="true" data-i18n="sum">Sum</button><button data-mode="mean" type="button" aria-pressed="false" data-i18n="mean">Average</button><button data-mode="z" type="button" aria-pressed="false" data-i18n="z">Z score</button></div>
+          </div>
+          <div class="metrics">
+            <div><span data-i18n="completedLabel">Completed groups</span><strong id="completed"></strong></div>
+            <div><span id="theory-label"></span><strong id="theory-mean">—</strong></div>
+            <div><span id="observed-label"></span><strong id="observed-mean">—</strong></div>
+          </div>
+          <div class="chart-controls">
+            <span class="legend-entry"><i class="swatch observed"></i><span data-i18n="observed">Observed frequency</span></span>
+            <label class="checkbox"><input id="show-exact" type="checkbox" checked><i class="swatch exact"></i><span data-i18n="exact">Exact distribution</span></label>
+            <label class="checkbox"><input id="show-normal" type="checkbox" checked><i class="swatch normal"></i><span data-i18n="normal">Normal approximation</span></label>
+          </div>
+          <div class="plot-options"><label class="checkbox"><input id="full-range" type="checkbox"><span data-i18n="fullRange">Show full possible range</span></label><span id="stat-note"></span></div>
+          <div class="histogram-wrap"><canvas id="histogram" role="img"></canvas><div id="chart-tooltip" class="chart-tooltip" hidden></div></div>
+          <div class="chart-footer"><span id="bin-note"></span><span id="status" role="status" aria-live="polite"></span></div>
+          <div class="run-details"><span id="timing">—</span><span id="used-seed">—</span></div>
+          <div class="progress-track" role="progressbar" data-i18n-aria="progressAria" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-fill"></div></div>
+        </section>
+        <details class="math-notes"><summary data-i18n="formulaTitle">Formulas &amp; reading the charts</summary><div><p data-i18n="formula1"></p><p data-i18n="formula2"></p><p data-i18n="formula3"></p><p data-i18n="formula4"></p><p data-i18n="formula5"></p><p data-i18n="formula6"></p></div></details>
+        <section class="lesson" data-i18n-aria="lessonAria">
+          <span class="lesson-number" data-i18n="lessonBadge">CLT</span><div><h3 id="lesson-title"></h3><p id="lesson-text"></p><p class="lesson-fixed" data-i18n="lessonFixed"></p></div>
+        </section>
+        <section class="comparison-section" data-i18n-aria="compareAria">
+          <div class="comparison-heading"><div><p class="eyebrow" data-i18n="compareEyebrow">SAME DIE / DIFFERENT GROUP SIZES</p><h2 data-i18n="compareTitle">One die, four group sizes</h2></div><span data-i18n="compareSubtitle">Equal group counts, separate random streams</span></div>
+          <div id="comparison-grid" class="comparison-grid"></div>
+          <p class="comparison-note" data-i18n="compareNote"></p>
+        </section>
+      </section>
+    </div>
+    <footer class="page-footer"><span data-i18n="footer">ProbabilityLab / Learn through experiments</span><span data-i18n="privacy">No models, APIs, or uploads · Computed in your browser</span></footer>
+  </main>
+</body>
+</html>

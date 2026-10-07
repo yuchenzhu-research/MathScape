@@ -1,0 +1,12 @@
+{
+  "name": "probability-lab",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Interactive probability experiments with adjustable dice and CPU/WebGPU Monte Carlo simulations",
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test tests/math.test.cjs tests/compute.test.cjs tests/gpu-math.test.cjs tests/i18n.test.cjs tests/server.test.cjs",
+    "test:ui": "node tests/ui.cjs",
+    "test:stress": "node tests/stress.cjs"
+  }
+}
